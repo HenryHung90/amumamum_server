@@ -96,6 +96,7 @@ app.use(passport.session());
 require("./passportConfig")(passport); //取得passportConfig的passport
 //----------------------------------------------------------------
 app.post("/app/login", (req, res, next) => {
+  res.send("hello world");
   passport.authenticate("local", (err, user, info) => {
     if (err) throw err;
     if (!user) {
