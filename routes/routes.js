@@ -83,6 +83,7 @@ router.post(process.env.ROUTER_USERINFO, async (req, res) => {
       StudentId: result.StudentId,
       Email: result.Email,
       Access: result.Access,
+      ////////////////////////////////////////////////////////////////
     };
     res.send(SendResponse);
   });
