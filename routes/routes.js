@@ -70,7 +70,11 @@ router.post(process.env.ROUTER_DIALOGFLOW, (req, res, next) => {
 router.post(process.env.ROUTER_CHECKUSER, async (req, res) => {
   SignUpTemplateCopy.findOne({ _id: req.body._id }, (err, result) => {
     if (err) throw err;
-    res.send(true);
+    if (result == null) {
+      res.send(false);
+    } else {
+      res.send(true);
+    }
   });
 });
 /////////////取得使用者（除密碼）/////////////////////////
