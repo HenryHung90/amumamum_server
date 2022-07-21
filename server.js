@@ -18,8 +18,11 @@ const passportLocal = require("passport-local").Strategy;
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
+const path = require("path");
 
-const RoutesUrls = require("./routes/routes");
+const RoutesMain = require("./routes/Mainroutes");
+const RoutesGrades = require("./routes/Graderoutes");
+const RoutesNote = require("./routes/Noteroutes");
 //WebSocket
 // const io = require("socket.io")(server);
 // const io = require("socket.io")
@@ -56,16 +59,11 @@ app.use(
     credentials: true,
   })
 );
-// app.use(
-//   cors({
-//     origin: "https://548a-36-224-72-109.ngrok.io",
-//     credentials: true,
-//   })
-// );
 //Middleware----------------------------------------------------------------
 //引入body-parser(用於解析json, row, txt, URL-encoded格式)
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extends: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
 /** For session key
  * @param {Object} [options]
@@ -117,7 +115,13 @@ app.post("/app/login", (req, res, next) => {
     }
   })(req, res, next); //Why do that? Author: I don't know, but it actually works
 });
+app.get("/findPic/:picturelocation", async (req, res) => {
+  // res.set("Content-Type", "image/png");
+  res.sendFile(`${__dirname}/public/uploads/${req.params.picturelocation}`);
+});
 
-app.use(process.env.ROUTER_MAIN, RoutesUrls);
+app.use(process.env.ROUTER_MAIN, RoutesMain);
+app.use(process.env.ROUTER_GRADE, RoutesGrades);
+app.use(process.env.ROUTER_NOTE, RoutesNote);
 
 app.listen(port, () => console.log("Server is running at" + host + ":" + port));

@@ -5,8 +5,12 @@ const MarkUserTemplate = new mongoose.Schema({
     type: "string",
     required: true,
   },
-  Mark: {
-    type: "object",
+  NoteClassify: {
+    type: "array",
+    required: true,
+  },
+  NoteContent: {
+    type: "array",
     required: true,
   },
 });
