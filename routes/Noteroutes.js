@@ -24,6 +24,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const UserNoteTemplateCopy = require("../models/UserNoteModels");
+const QuestionTemplateCopy = require("../models/QuestionModel");
 
 ///////////筆記內容規範 UserContent///////////////////////////
 
@@ -194,27 +195,105 @@ router.post(process.env.ROUTER_NOTE_UPDATE, async (req, res) => {
   res.send("修改成功!");
 });
 
-router.post("/uploadpicture", upload.array("photos", 3), async (req, res) => {
-  // res.send("success");
+router.post(
+  process.env.ROUTER_NOTE_UPLOAD_PICTURE,
+  upload.array("photos", 3),
+  async (req, res) => {
+    // res.send("success");
 
-  if (req.files == undefined) {
-    return res.send("無照片上傳");
+    if (req.files == undefined) {
+      return res.send("無照片上傳");
+    }
+
+    let filesPath = [];
+
+    for (let i = 0; i < req.files.length; i++) {
+      filesPath.push(req.files[i].filename);
+    }
+
+    res.send(filesPath);
   }
-  console.log(req.files);
-  let filesPath = [];
+);
 
-  for (let i = 0; i < req.files.length; i++) {
-    filesPath.push(req.files[i].filename);
-  }
-
-  res.send(filesPath);
-});
-
-router.post("/deletepicture", async (req, res) => {
+router.post(process.env.ROUTER_NOTE_DELETE_PICTURE, async (req, res) => {
   let files = [];
 
   if (fs.existsSync()) {
   }
+});
+
+//問題上傳
+router.post(process.env.ROUTER_QUESTION_CREATE, async (req, res) => {
+  const QuestionSave = new QuestionTemplateCopy({
+    QuestionId: req.body.QuestionId,
+    IsCompleted: false,
+    StudentId: req.body.StudentId,
+    Question: req.body.Question,
+    Response: req.body.Response,
+  });
+  QuestionSave.save().then((response) => {
+    res.send("success");
+  });
+});
+
+//問題讀取
+router.get(process.env.ROUTER_QUESTION_READ, async (req, res) => {
+  QuestionTemplateCopy.find({}).then((response) => {
+    res.send(response.reverse());
+  });
+});
+
+//問題更新
+router.post(process.env.ROUTER_QUESTION_UPDATE, async (req, res) => {
+  const QuestionData = QuestionTemplateCopy.findOne({
+    QuestionId: req.body.QuestionId,
+  }).exec();
+
+  let LocalResponse;
+  let LocalQuestion;
+
+  await QuestionData.then((doc) => {
+    LocalResponse = doc.Response;
+    LocalQuestion = doc.Question;
+  });
+
+  if (req.body.EditResponse === true && req.body.Response !== undefined) {
+    LocalResponse = req.body.Response;
+  } else {
+    LocalResponse.push(req.body.Response);
+  }
+  if (req.body.Question !== undefined) {
+    LocalQuestion = req.body.Question;
+  }
+
+  const QuestionUpdate = QuestionTemplateCopy.updateOne(
+    { QuestionId: req.body.QuestionId },
+    { Question: LocalQuestion, Response: LocalResponse }
+  ).exec();
+
+  await QuestionUpdate.then((response) => {
+    res.send("success");
+  });
+});
+
+//問題刪除
+router.post(process.env.ROUTER_QUESTION_DELETE, async (req, res) => {
+  QuestionTemplateCopy.deleteOne({
+    QuestionId: req.body.QuestionId,
+  }).then((response) => {
+    res.send("success");
+  });
+});
+
+//問題解決
+router.post(process.env.ROUTER_QUESTION_COMPLETED, async (req, res) => {
+  const QuestionData = QuestionTemplateCopy.updateOne(
+    { QuestionId: req.body.QuestionId },
+    { IsCompleted: req.body.IsCompleted }
+  ).exec();
+  await QuestionData.then((doc) => {
+    res.send("success");
+  });
 });
 // router.post(process.env.ROUTER_NOTE_CREATE, async (req, res) => {
 //   let UserNote;

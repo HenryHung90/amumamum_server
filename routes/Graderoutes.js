@@ -258,13 +258,15 @@ router.post(process.env.ROUTER_AVLGRADEINFOEASY, async (req, res) => {
     { StudentId: req.body.StudentId },
     (err, result) => {
       if (err) throw err;
-      const SendResponse = {
-        StudentId: result.StudentId,
-        Grades: result.Grades,
-        Time: result.Time,
-        ////////////////////////////////////////////////////////////////
-      };
-      res.send(SendResponse);
+      if (result !== null) {
+        const SendResponse = {
+          StudentId: result.StudentId,
+          Grades: result.Grades,
+          Time: result.Time,
+          ////////////////////////////////////////////////////////////////
+        };
+        res.send(SendResponse);
+      }
     }
   );
 });
