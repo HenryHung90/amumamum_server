@@ -201,6 +201,7 @@ router.post(
   async (req, res) => {
     // res.send("success");
 
+    console.log(req);
     if (req.files == undefined) {
       return res.send("無照片上傳");
     }
